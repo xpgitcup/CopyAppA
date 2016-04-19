@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="module_copyappa" default="compile.module.copyappa">
+  <dirname property="module.copyappa.basedir" file="${ant.file.module_copyappa}"/>
+  
+  <property name="module.jdk.home.copyappa" value="${project.jdk.home}"/>
+  <property name="module.jdk.bin.copyappa" value="${project.jdk.bin}"/>
+  <property name="module.jdk.classpath.copyappa" value="${project.jdk.classpath}"/>
+  
+  <property name="compiler.args.copyappa" value="-encoding UTF-8 -source 8 -target 8 ${compiler.args}"/>
+  
+  <property name="copyappa.output.dir" value="${module.copyappa.basedir}/out/production/CopyAppA"/>
+  <property name="copyappa.testoutput.dir" value="${module.copyappa.basedir}/out/test/CopyAppA"/>
+  
+  <path id="copyappa.module.bootclasspath">
+    <!-- Paths to be included in compilation bootclasspath -->
+  </path>
+  
+  <path id="copyappa.module.production.classpath">
+    <path refid="${module.jdk.classpath.copyappa}"/>
+    <path refid="library.groovy-2.4.6.classpath"/>
+  </path>
+  
+  <path id="copyappa.runtime.production.module.classpath">
+    <pathelement location="${copyappa.output.dir}"/>
+    <path refid="library.groovy-2.4.6.classpath"/>
+  </path>
+  
+  <path id="copyappa.module.classpath">
+    <path refid="${module.jdk.classpath.copyappa}"/>
+    <pathelement location="${copyappa.output.dir}"/>
+    <path refid="library.groovy-2.4.6.classpath"/>
+  </path>
+  
+  <path id="copyappa.runtime.module.classpath">
+    <pathelement location="${copyappa.testoutput.dir}"/>
+    <pathelement location="${copyappa.output.dir}"/>
+    <path refid="library.groovy-2.4.6.classpath"/>
+  </path>
+  
+  
+  <patternset id="excluded.from.module.copyappa">
+    <patternset refid="ignored.files"/>
+  </patternset>
+  
+  <patternset id="excluded.from.compilation.copyappa">
+    <patternset refid="excluded.from.module.copyappa"/>
+  </patternset>
+  
+  <path id="copyappa.module.sourcepath">
+    <dirset dir="${module.copyappa.basedir}">
+      <include name="src"/>
+    </dirset>
+  </path>
+  
+  
+  <target name="compile.module.copyappa" depends="compile.module.copyappa.production,compile.module.copyappa.tests" description="Compile module CopyAppA"/>
+  
+  <target name="compile.module.copyappa.production" depends="register.custom.compilers" description="Compile module CopyAppA; production classes">
+    <mkdir dir="${copyappa.output.dir}"/>
+    <groovyc destdir="${copyappa.output.dir}" fork="yes">
+      <src refid="copyappa.module.sourcepath"/>
+      <classpath refid="copyappa.module.production.classpath"/>
+      <patternset refid="excluded.from.compilation.copyappa"/>
+      <javac debug="${compiler.debug}">
+        <compilerarg line="${compiler.args.copyappa}"/>
+      </javac>
+    </groovyc>
+    <instrumentIdeaExtensions destdir="${copyappa.output.dir}">
+      <compilerarg line="${compiler.args.copyappa}"/>
+      <bootclasspath refid="copyappa.module.bootclasspath"/>
+      <classpath refid="copyappa.module.production.classpath"/>
+      <src refid="copyappa.module.sourcepath"/>
+      <patternset refid="excluded.from.compilation.copyappa"/>
+    </instrumentIdeaExtensions>
+    
+    <copy todir="${copyappa.output.dir}">
+      <fileset dir="${module.copyappa.basedir}/src">
+        <patternset refid="compiler.resources"/>
+        <type type="file"/>
+      </fileset>
+    </copy>
+  </target>
+  
+  <target name="compile.module.copyappa.tests" depends="register.custom.compilers,compile.module.copyappa.production" description="compile module CopyAppA; test classes" unless="skip.tests"/>
+  
+  <target name="clean.module.copyappa" description="cleanup module">
+    <delete dir="${copyappa.output.dir}"/>
+    <delete dir="${copyappa.testoutput.dir}"/>
+  </target>
+</project>
