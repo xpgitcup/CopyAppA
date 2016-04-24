@@ -23,47 +23,28 @@ class TargetApplication {
      */
     def updateProjectName() {
         def pName = "${appPath}\\${appName}\\application.properties"
-        def oName = "${appPath}\\${appName}\\application.propertiesA"
+        //def oName = "${appPath}\\${appName}\\application.propertiesA"
         println("关键文件：${pName}")
         def pFile = new File(pName)
         def properties = new Properties()
-        if (pFile.exists()) {
-            def fis = new FileInputStream(pFile)
-            InputStreamReader isr = new InputStreamReader(fis, "UTF-8")
-            properties.load(isr)
-            //isr.close()
-            fis.close()
-            println(properties.getProperty("app.name"))
-            //----------------------------------------------------------------------------------------------------------
-            def dFile = new File(pName)
-            if (dFile.exists()) {
-                if (dFile.delete()) {
-                    println("还在吗？" + pFile.exists())
-                    properties.setProperty("app.name", this.appName)
-                    def oFile = new File(pName)
-                    println("新文件还在吗？" + oFile.exists())
-                    if (oFile.createNewFile()) {
-                        def fos = new FileOutputStream(oFile)
-                        println("新文件:" + oFile.exists())
-                        try {
-                            OutputStreamWriter osw = new OutputStreamWriter(fos, "UTF-8")
-                            //properties.store(osw, "Grails Metadata file")
-
-                            fos.close()
-                            println("修改工程名称为：${appName}")
-                        }
-                        catch (IOException e) {
-                            println(e.message)
-                        }
-                    } else {
-                        println("创建文件出错了!")
-                    }
-                } else {
-                    println("无法删除原文件！")
-                }
+        try {
+            if (pFile.exists()) {
+                def fis = new FileInputStream(pFile)
+                def isr = new InputStreamReader(fis, "UTF-8")
+                properties.load(isr)
+                println(properties.getProperty("app.name"))
+                //----------------------------------------------------------------------------------------------------------
+                properties.setProperty("app.name", this.appName)
+                def fos = new FileOutputStream(pFile)
+                def osw = new OutputStreamWriter(fos, "UTF-8")
+                println(properties.getProperty("app.name"))
+                properties.store(osw, "Grails Metadata file")
+                println("修改工程名称为：${appName}")
             } else {
-                println("找不到了!")
+                println("找不到关键文件：${pFile.name}")
             }
+        } catch (IOException e) {
+            println(e.message)
         }
     }
 
