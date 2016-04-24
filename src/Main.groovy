@@ -51,20 +51,13 @@ class Main {
             println("当前目录：${iniFile.absolutePath}")
             println("SeedApplication.ini 文件不存在！")
         }
-        //分析参数，生成目标程序的路径
-        //调用系统命令，拷贝文件
-        xcopyApplication(args, seedProperties)
-        //修改文件
-        //修改程序名----
 
         //创建类对象
         def targetApplication = new TargetApplication()
         targetApplication.processArgs(args)
         println(targetApplication)
-        //println(this.getClass().getResource("/").getPath())
-
-        //System.out.println(System.getProperty("java.class.path"));    //成功，但是不是想要的结果
-
+        targetApplication.copyApplication(seedProperties)
+        targetApplication.updateProjectName()
     }
 
     /**
@@ -105,28 +98,4 @@ class Main {
         return tempa
     }
 
-    /**
-     * 拷贝种子程序到目标程序目录
-     * */
-    def static xcopyApplication(String[] args, Properties properties) {
-        println("${args} ---- ${properties}")
-        def targetApplication
-        def source = properties.getProperty("主目录")
-        def targetPath
-        if (args.length > 0) {
-            targetApplication = args[0]
-            if (!targetApplication.contains("\\")) {
-                targetApplication = getCurrentRunPath() + "\\" + targetApplication
-            }
-            println("目标：" + targetApplication)
-        }
-        def commond = "xcopy ${source} ${targetApplication} /E /I /Y"
-        println(commond)
-        Runtime runtime = Runtime.getRuntime()
-        try {
-            runtime.exec(commond)
-        } catch (Exception e) {
-            println(e)
-        }
-    }
 }
